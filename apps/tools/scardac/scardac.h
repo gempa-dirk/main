@@ -52,16 +52,12 @@ class Worker {
 
 		bool dbConnect();
 
-		DataModel::DatabaseIterator dbSegments(size_t &segmentsOutside);
+		DataModel::DatabaseIterator dbSegments();
 		bool readChunkSegments(Segments &segments, const std::string &chunk,
-		                       DataModel::DataSegmentPtr chunkSeg,
 		                       const Core::Time &mtime,
 		                       const Core::TimeWindow &window);
 
-		void diffSegment(DataModel::DatabaseIterator &db_seg_it,
-		                 DataModel::DataSegment *chunkSeg, bool extent = false);
-
-		bool writeExtent(DataModel::Operation op);
+		bool writeExtent(const DataModel::Operation &op);
 		bool syncSegments();
 		void syncExtent();
 		void readAttExtMillis(DataModel::DataAttributeExtent *attExt);
@@ -80,7 +76,8 @@ class Worker {
 		std::string                     _sid;
 		bool                            _segmentOverflow{false};
 		size_t                          _segCount{0};
-		Segments                        _segmentsStore;
+		Segments                        _segmentsInsert;
+		Segments                        _segmentsUpdate;
 		Segments                        _segmentsRemove;
 };
 
@@ -137,6 +134,7 @@ class SCARDAC : public Client::Application {
 		int             _threads{1};
 		float           _jitter{0.5};
 		size_t          _maxSegments{1000000};
+		size_t          _maxChunkOverlap{500};
 		std::string     _wfidFile;
 		std::string     _start;
 		std::string     _end;
